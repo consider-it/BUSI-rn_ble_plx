@@ -6,6 +6,7 @@ public enum Event {
     ReadEvent("ReadEvent"),
     StateChangeEvent("StateChangeEvent"),
     RestoreStateEvent("RestoreStateEvent"),
+    NullAdapterEvent("NullAdapterEvent"),
     DisconnectionEvent("DisconnectionEvent");
 
     public String name;
