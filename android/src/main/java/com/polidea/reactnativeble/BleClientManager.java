@@ -96,32 +96,49 @@ public class BleClientManager extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void destroyClient() {
+      try {
         bleAdapter.destroyClient();
         bleAdapter = null;
+      } catch (Exception e) {
+        sendEvent(Event.NullAdapterEvent, e);
+      }
     }
 
     // Mark: Common --------------------------------------------------------------------------------
 
     @ReactMethod
     public void cancelTransaction(String transactionId) {
+      try {
         bleAdapter.cancelTransaction(transactionId);
+      } catch (Exception e) {
+        sendEvent(Event.NullAdapterEvent, e);
+      }
     }
 
     @ReactMethod
     public void setLogLevel(String logLevel) {
+      try {
         bleAdapter.setLogLevel(logLevel);
+      } catch (Exception e) {
+        sendEvent(Event.NullAdapterEvent, e);
+      }
     }
 
     @ReactMethod
     public void logLevel(Promise promise) {
+      try {
         promise.resolve(bleAdapter.getLogLevel());
+      } catch (Exception e) {
+        sendEvent(Event.NullAdapterEvent, e);
+      }
     }
 
     // Mark: Monitoring state ----------------------------------------------------------------------
 
     @ReactMethod
     public void enable(final String transactionId, final Promise promise) {
-        final SafePromise safePromise = new SafePromise(promise);
+      final SafePromise safePromise = new SafePromise(promise);
+      try {
         bleAdapter.enable(transactionId, new OnSuccessCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
@@ -133,27 +150,38 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                 safePromise.reject(null, errorConverter.toJs(error));
             }
         });
+      } catch (Exception e) {
+        sendEvent(Event.NullAdapterEvent, e);
+      }
     }
 
     @ReactMethod
     public void disable(final String transactionId, final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
-        bleAdapter.disable(transactionId, new OnSuccessCallback<Void>() {
-            @Override
-            public void onSuccess(Void data) {
-                safePromise.resolve(null);
-            }
-        }, new OnErrorCallback() {
-            @Override
-            public void onError(BleError error) {
-                safePromise.reject(null, errorConverter.toJs(error));
-            }
-        });
+        try {
+          bleAdapter.disable(transactionId, new OnSuccessCallback<Void>() {
+              @Override
+              public void onSuccess(Void data) {
+                  safePromise.resolve(null);
+              }
+          }, new OnErrorCallback() {
+              @Override
+              public void onError(BleError error) {
+                  safePromise.reject(null, errorConverter.toJs(error));
+              }
+          });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void state(Promise promise) {
-        promise.resolve(bleAdapter.getCurrentState());
+        try {
+            promise.resolve(bleAdapter.getCurrentState());
+        } catch (Exception e) {
+            sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     // Mark: Scanning ------------------------------------------------------------------------------
@@ -175,31 +203,40 @@ public class BleClientManager extends ReactContextBaseJavaModule {
             }
         }
 
-        bleAdapter.startDeviceScan(
-                filteredUUIDs != null ? ReadableArrayConverter.toStringArray(filteredUUIDs) : null,
-                scanMode, callbackType,
-                new OnEventCallback<ScanResult>() {
-                    @Override
-                    public void onEvent(ScanResult data) {
-                        sendEvent(Event.ScanEvent, scanResultConverter.toJSCallback(data));
-                    }
-                }, new OnErrorCallback() {
-                    @Override
-                    public void onError(BleError error) {
-                        sendEvent(Event.ScanEvent, errorConverter.toJSCallback(error));
-                    }
-                });
+        try {
+          bleAdapter.startDeviceScan(
+                  filteredUUIDs != null ? ReadableArrayConverter.toStringArray(filteredUUIDs) : null,
+                  scanMode, callbackType,
+                  new OnEventCallback<ScanResult>() {
+                      @Override
+                      public void onEvent(ScanResult data) {
+                          sendEvent(Event.ScanEvent, scanResultConverter.toJSCallback(data));
+                      }
+                  }, new OnErrorCallback() {
+                      @Override
+                      public void onError(BleError error) {
+                          sendEvent(Event.ScanEvent, errorConverter.toJSCallback(error));
+                      }
+                  });
+          } catch (Exception e) {
+            sendEvent(Event.NullAdapterEvent, e);
+          }
     }
 
     @ReactMethod
     public void stopDeviceScan() {
-        bleAdapter.stopDeviceScan();
+        try {
+            bleAdapter.stopDeviceScan();
+        } catch (Exception e) {
+            sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     // Mark: Device management ---------------------------------------------------------------------
 
     @ReactMethod
     public void devices(final ReadableArray deviceIdentifiers, final Promise promise) {
+      try {
         bleAdapter.getKnownDevices(ReadableArrayConverter.toStringArray(deviceIdentifiers),
                 new OnSuccessCallback<Device[]>() {
                     @Override
@@ -216,10 +253,14 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(error));
                     }
                 });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void connectedDevices(final ReadableArray serviceUUIDs, final Promise promise) {
+      try {
         bleAdapter.getConnectedDevices(ReadableArrayConverter.toStringArray(serviceUUIDs),
                 new OnSuccessCallback<Device[]>() {
                     @Override
@@ -236,6 +277,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(error));
                     }
                 });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     // Mark: Device operations ---------------------------------------------------------------------
@@ -243,41 +287,50 @@ public class BleClientManager extends ReactContextBaseJavaModule {
     @ReactMethod
     public void requestConnectionPriorityForDevice(final String deviceId, int connectionPriority, final String transactionId, final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
-        bleAdapter.requestConnectionPriorityForDevice(deviceId, connectionPriority, transactionId,
-                new OnSuccessCallback<Device>() {
-                    @Override
-                    public void onSuccess(Device data) {
-                        safePromise.resolve(deviceConverter.toJSObject(data));
-                    }
-                }, new OnErrorCallback() {
-                    @Override
-                    public void onError(BleError error) {
-                        safePromise.reject(null, errorConverter.toJs(error));
-                    }
-                });
+        try {
+          bleAdapter.requestConnectionPriorityForDevice(deviceId, connectionPriority, transactionId,
+                  new OnSuccessCallback<Device>() {
+                      @Override
+                      public void onSuccess(Device data) {
+                          safePromise.resolve(deviceConverter.toJSObject(data));
+                      }
+                  }, new OnErrorCallback() {
+                      @Override
+                      public void onError(BleError error) {
+                          safePromise.reject(null, errorConverter.toJs(error));
+                      }
+                  });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void requestMTUForDevice(final String deviceId, int mtu, final String transactionId, final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
-        bleAdapter.requestMTUForDevice(deviceId, mtu, transactionId,
-                new OnSuccessCallback<Device>() {
-                    @Override
-                    public void onSuccess(Device data) {
-                        safePromise.resolve(deviceConverter.toJSObject(data));
-                    }
-                }, new OnErrorCallback() {
-                    @Override
-                    public void onError(BleError error) {
-                        safePromise.reject(null, errorConverter.toJs(error));
-                    }
-                });
+        try {
+          bleAdapter.requestMTUForDevice(deviceId, mtu, transactionId,
+                  new OnSuccessCallback<Device>() {
+                      @Override
+                      public void onSuccess(Device data) {
+                          safePromise.resolve(deviceConverter.toJSObject(data));
+                      }
+                  }, new OnErrorCallback() {
+                      @Override
+                      public void onError(BleError error) {
+                          safePromise.reject(null, errorConverter.toJs(error));
+                      }
+                  });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void readRSSIForDevice(final String deviceId, final String transactionId, final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
-        bleAdapter.readRSSIForDevice(deviceId, transactionId,
+        try {
+          bleAdapter.readRSSIForDevice(deviceId, transactionId,
                 new OnSuccessCallback<Device>() {
                     @Override
                     public void onSuccess(Device data) {
@@ -289,6 +342,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         safePromise.reject(null, errorConverter.toJs(error));
                     }
                 });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -318,43 +374,48 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                 connectionPriority = options.getInt("connectionPriority");
             }
         }
-        bleAdapter.connectToDevice(
-                deviceId,
-                new ConnectionOptions(autoConnect,
-                        requestMtu,
-                        refreshGattMoment,
-                        timeout != null ? timeout.longValue() : null,
-                        connectionPriority),
-                new OnSuccessCallback<Device>() {
-                    @Override
-                    public void onSuccess(Device data) {
-                        safePromise.resolve(deviceConverter.toJSObject(data));
-                    }
-                },
-                new OnEventCallback<ConnectionState>() {
-                    @Override
-                    public void onEvent(ConnectionState connectionState) {
-                        if (connectionState == ConnectionState.DISCONNECTED) {
-                            WritableArray event = Arguments.createArray();
-                            event.pushNull();
-                            WritableMap device = Arguments.createMap();
-                            device.putString("id", deviceId);
-                            event.pushMap(device);
-                            sendEvent(Event.DisconnectionEvent, event);
-                        }
-                    }
-                },
-                new OnErrorCallback() {
-                    @Override
-                    public void onError(BleError error) {
-                        safePromise.reject(null, errorConverter.toJs(error));
-                    }
-                });
+        try {
+          bleAdapter.connectToDevice(
+                  deviceId,
+                  new ConnectionOptions(autoConnect,
+                          requestMtu,
+                          refreshGattMoment,
+                          timeout != null ? timeout.longValue() : null,
+                          connectionPriority),
+                  new OnSuccessCallback<Device>() {
+                      @Override
+                      public void onSuccess(Device data) {
+                          safePromise.resolve(deviceConverter.toJSObject(data));
+                      }
+                  },
+                  new OnEventCallback<ConnectionState>() {
+                      @Override
+                      public void onEvent(ConnectionState connectionState) {
+                          if (connectionState == ConnectionState.DISCONNECTED) {
+                              WritableArray event = Arguments.createArray();
+                              event.pushNull();
+                              WritableMap device = Arguments.createMap();
+                              device.putString("id", deviceId);
+                              event.pushMap(device);
+                              sendEvent(Event.DisconnectionEvent, event);
+                          }
+                      }
+                  },
+                  new OnErrorCallback() {
+                      @Override
+                      public void onError(BleError error) {
+                          safePromise.reject(null, errorConverter.toJs(error));
+                      }
+                  });
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void cancelDeviceConnection(String deviceId, Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
+        try {
         bleAdapter.cancelDeviceConnection(deviceId,
                 new OnSuccessCallback<Device>() {
                     @Override
@@ -367,10 +428,14 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         safePromise.reject(null, errorConverter.toJs(error));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void isDeviceConnected(String deviceId, final Promise promise) {
+      try {
         bleAdapter.isDeviceConnected(deviceId,
                 new OnSuccessCallback<Boolean>() {
                     @Override
@@ -383,6 +448,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(error));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     // Mark: Discovery -----------------------------------------------------------------------------
@@ -390,6 +458,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
     @ReactMethod
     public void discoverAllServicesAndCharacteristicsForDevice(String deviceId, final String transactionId, final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
+        try {
         bleAdapter.discoverAllServicesAndCharacteristicsForDevice(deviceId, transactionId,
                 new OnSuccessCallback<Device>() {
                     @Override
@@ -402,6 +471,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         safePromise.reject(null, errorConverter.toJs(error));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     // Mark: Service and characteristic getters ----------------------------------------------------
@@ -512,6 +584,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                              final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
 
+        try {
         bleAdapter.writeCharacteristicForDevice(
                 deviceId, serviceUUID, characteristicUUID, valueBase64, response, transactionId,
                 new OnSuccessCallback<Characteristic>() {
@@ -526,6 +599,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -536,6 +612,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                               final String transactionId,
                                               final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
+        try {
         bleAdapter.writeCharacteristicForService(
                 serviceIdentifier, characteristicUUID, valueBase64, response, transactionId,
                 new OnSuccessCallback<Characteristic>() {
@@ -550,6 +627,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -560,6 +640,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                     final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
 
+        try {
         bleAdapter.writeCharacteristic(characteristicIdentifier, valueBase64, response, transactionId,
                 new OnSuccessCallback<Characteristic>() {
                     @Override
@@ -572,6 +653,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         safePromise.reject(null, errorConverter.toJs(error));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -582,6 +666,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                             final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
 
+        try {
         bleAdapter.readCharacteristicForDevice(
                 deviceId, serviceUUID, characteristicUUID, transactionId,
                 new OnSuccessCallback<Characteristic>() {
@@ -596,6 +681,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -605,6 +693,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                              final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
 
+        try {
         bleAdapter.readCharacteristicForService(
                 serviceIdentifier, characteristicUUID, transactionId,
                 new OnSuccessCallback<Characteristic>() {
@@ -619,6 +708,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -627,6 +719,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                    final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
 
+        try {
         bleAdapter.readCharacteristic(
                 characteristicIdentifier, transactionId,
                 new OnSuccessCallback<Characteristic>() {
@@ -641,6 +734,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -650,6 +746,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                                final String transactionId,
                                                final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
+        try {
         bleAdapter.monitorCharacteristicForDevice(
                 deviceId, serviceUUID, characteristicUUID, transactionId,
                 new OnEventCallback<Characteristic>() {
@@ -668,6 +765,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -676,6 +776,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                                 final String transactionId,
                                                 final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
+        try {
         bleAdapter.monitorCharacteristicForService(
                 serviceIdentifier, characteristicUUID, transactionId,
                 new OnEventCallback<Characteristic>() {
@@ -694,6 +795,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -702,6 +806,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                       final Promise promise) {
         final SafePromise safePromise = new SafePromise(promise);
         //TODO resolve safePromise with null when monitoring has been completed
+        try {
         bleAdapter.monitorCharacteristic(
                 characteristicIdentifier, transactionId,
                 new OnEventCallback<Characteristic>() {
@@ -720,6 +825,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -729,6 +837,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                         final String descriptorUUID,
                                         final String transactionId,
                                         final Promise promise) {
+                                          try {
         bleAdapter.readDescriptorForDevice(
                 deviceId,
                 serviceUUID,
@@ -746,6 +855,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(bleError));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -754,6 +866,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                          final String descriptorUUID,
                                          final String transactionId,
                                          final Promise promise) {
+                                          try {
         bleAdapter.readDescriptorForService(
                 serviceIdentifier,
                 characteristicUUID,
@@ -771,6 +884,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(bleError));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -778,6 +894,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                                 final String descriptorUUID,
                                                 final String transactionId,
                                                 final Promise promise) {
+                                                  try {
         bleAdapter.readDescriptorForCharacteristic(
                 characteristicIdentifier,
                 descriptorUUID,
@@ -794,12 +911,16 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(bleError));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
     public void readDescriptor(final int descriptorIdentifier,
                                final String transactionId,
                                final Promise promise) {
+                                try {
         bleAdapter.readDescriptor(
                 descriptorIdentifier,
                 transactionId,
@@ -815,6 +936,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                         promise.reject(null, errorConverter.toJs(bleError));
                     }
                 });
+                } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -825,6 +949,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                          final String valueBase64,
                                          final String transactionId,
                                          final Promise promise) {
+                                          try {
         bleAdapter.writeDescriptorForDevice(
                 deviceId,
                 serviceUUID,
@@ -845,6 +970,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -854,6 +982,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                           final String valueBase64,
                                           final String transactionId,
                                           final Promise promise) {
+                                            try {
         bleAdapter.writeDescriptorForService(
                 serviceIdentifier,
                 characteristicUUID,
@@ -873,6 +1002,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -881,6 +1013,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                                  final String valueBase64,
                                                  final String transactionId,
                                                  final Promise promise) {
+                                                  try {
         bleAdapter.writeDescriptorForCharacteristic(
                 characteristicIdentifier,
                 descriptorUUID,
@@ -899,6 +1032,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
@@ -906,6 +1042,7 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                                 final String valueBase64,
                                 final String transactionId,
                                 final Promise promise) {
+                                  try {
         bleAdapter.writeDescriptor(
                 descriptorIdentifier,
                 valueBase64,
@@ -923,6 +1060,9 @@ public class BleClientManager extends ReactContextBaseJavaModule {
                     }
                 }
         );
+        } catch (Exception e) {
+          sendEvent(Event.NullAdapterEvent, e);
+        }
     }
 
     @ReactMethod
