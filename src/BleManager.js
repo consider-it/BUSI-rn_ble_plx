@@ -67,6 +67,11 @@ export class BleManager {
     this._activePromises = {}
     this._activeSubscriptions = {}
 
+    this._activeSubscriptions[this._nextUniqueID()] = this._eventEmitter.addListener(
+      BleModule.NullAdapterEvent,
+      (error: BleError) => { throw parseBleError(error.message, this._errorCodesToMessagesMapping) }
+    )
+
     const restoreStateFunction = options.restoreStateFunction
     if (restoreStateFunction != null && options.restoreStateIdentifier != null) {
       this._activeSubscriptions[this._nextUniqueID()] = this._eventEmitter.addListener(

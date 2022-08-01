@@ -1,5 +1,6 @@
 package com.polidea.reactnativeble;
 
+import android.support.annotation.NonNull;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -25,12 +26,7 @@ import com.polidea.multiplatformbleadapter.RefreshGattMoment;
 import com.polidea.multiplatformbleadapter.ScanResult;
 import com.polidea.multiplatformbleadapter.Service;
 import com.polidea.multiplatformbleadapter.errors.BleError;
-import com.polidea.reactnativeble.converter.BleErrorToJsObjectConverter;
-import com.polidea.reactnativeble.converter.CharacteristicToJsObjectConverter;
-import com.polidea.reactnativeble.converter.DescriptorToJsObjectConverter;
-import com.polidea.reactnativeble.converter.DeviceToJsObjectConverter;
-import com.polidea.reactnativeble.converter.ScanResultToJsObjectConverter;
-import com.polidea.reactnativeble.converter.ServiceToJsObjectConverter;
+import com.polidea.reactnativeble.converter.*;
 import com.polidea.reactnativeble.utils.ReadableArrayConverter;
 import com.polidea.reactnativeble.utils.SafePromise;
 
@@ -41,13 +37,13 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-
 public class BleClientManager extends ReactContextBaseJavaModule {
 
     // Name of module
     private static final String NAME = "BleClientManager";
 
     // Value converters
+    private final GenericExceptionConverter genericExceptionConverter = new GenericExceptionConverter();
     private final BleErrorToJsObjectConverter errorConverter = new BleErrorToJsObjectConverter();
     private final ScanResultToJsObjectConverter scanResultConverter = new ScanResultToJsObjectConverter();
     private final DeviceToJsObjectConverter deviceConverter = new DeviceToJsObjectConverter();
@@ -1076,8 +1072,12 @@ public class BleClientManager extends ReactContextBaseJavaModule {
     }
 
     private void sendEvent(@NonNull Event event, @Nullable Object params) {
-        getReactApplicationContext()
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(event.name, params);
+        try {
+            getReactApplicationContext()
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(event.name, params);
+        } catch (Exception e) {
+            sendEvent(Event.NullAdapterEvent, genericExceptionConverter.toJs(e));
+        }
     }
 }
