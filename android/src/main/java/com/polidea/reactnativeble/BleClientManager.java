@@ -1,6 +1,5 @@
 package com.polidea.reactnativeble;
 
-import android.support.annotation.NonNull;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
