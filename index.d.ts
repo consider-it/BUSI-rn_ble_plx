@@ -1,3 +1,6 @@
+import { IMessageSource } from "@consider-it/v2x-common"
+import { Buffer } from 'buffer';
+
 declare module '@consider-it/react-native-ble-plx' {
   // TypeDefinition.js *************************************************************************************************
 
@@ -979,6 +982,26 @@ declare module '@consider-it/react-native-ble-plx' {
      */
     connectedPeripherals: NativeDevice[]
   }
+
+  // BlePlxV2xRxMsgSrc.js **********************************************************************************************
+
+  export class BlePlxV2xRxMsgSrc implements IMessageSource {
+    constructor(onConnect: (error?: Error) => void)
+    type: MessageSourceType;
+    connect: (() => void) | ((onConnect?: (error?: any) => void) => void);
+    disconnect: () => void;
+    getStatus: () => Observable<ClientStatus>;
+    getObuPos: () => Observable<ObuPos>;
+    getItsMessages: () => Observable<MessageSourceMessage>;
+  }
+
+  export declare class BleMessageBuilder {
+    onMessageBuilt: (msg: Buffer) => void;
+    private _currentMsg;
+    private _awaiting;
+    constructor(onMessageBuilt: (msg: Buffer) => void);
+    enqueuePacket: (packet: Buffer) => void;
+}
 
   // BleManager.js *****************************************************************************************************
 

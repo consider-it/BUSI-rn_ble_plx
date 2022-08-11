@@ -8,6 +8,7 @@ export { Characteristic } from './src/Characteristic'
 export { Descriptor } from './src/Descriptor'
 export { fullUUID } from './src/Utils'
 export { State, LogLevel, ConnectionPriority, ScanCallbackType, ScanMode } from './src/TypeDefinition'
+export { BlePlxV2xRxMsgSrc } from './src/BlePlxV2xRxMsgSrc'
 
 export type {
   Subscription,
@@ -15,6 +16,7 @@ export type {
   UUID,
   TransactionId,
   Base64,
+  BlePlxV2xRxMsgSrc,
   ScanOptions,
   ConnectionOptions,
   BleManagerOptions,

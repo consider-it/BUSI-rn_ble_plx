@@ -18,7 +18,6 @@
     "@react-native-community/eslint-config": "^2.0.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
-    "documentation": "^13.0.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-flowtype": "^5.2.0",
@@ -53,5 +52,10 @@
   "bugs": {
     "url": "https://github.com/consider-it/BUSI-rn_ble_plx"
   },
-  "homepage": "https://github.com/consider-it/BUSI-rn_ble_plx#readme"
+  "homepage": "https://github.com/consider-it/BUSI-rn_ble_plx#readme",
+  "dependencies": {
+    "@consider-it/v2x-common": "^0.2.7",
+    "buffer": "^6.0.3",
+    "rxjs": "^7.5.6"
+  }
 }
